@@ -26,6 +26,12 @@ func (s *BaseJsonGrammarListener) EnterProg(ctx *ProgContext) {}
 // ExitProg is called when production prog is exited.
 func (s *BaseJsonGrammarListener) ExitProg(ctx *ProgContext) {}
 
+// EnterExpr is called when production expr is entered.
+func (s *BaseJsonGrammarListener) EnterExpr(ctx *ExprContext) {}
+
+// ExitExpr is called when production expr is exited.
+func (s *BaseJsonGrammarListener) ExitExpr(ctx *ExprContext) {}
+
 // EnterJsonObjectExpr is called when production JsonObjectExpr is entered.
 func (s *BaseJsonGrammarListener) EnterJsonObjectExpr(ctx *JsonObjectExprContext) {}
 

@@ -10,6 +10,9 @@ type JsonGrammarListener interface {
 	// EnterProg is called when entering the prog production.
 	EnterProg(c *ProgContext)
 
+	// EnterExpr is called when entering the expr production.
+	EnterExpr(c *ExprContext)
+
 	// EnterJsonObjectExpr is called when entering the JsonObjectExpr production.
 	EnterJsonObjectExpr(c *JsonObjectExprContext)
 
@@ -48,6 +51,9 @@ type JsonGrammarListener interface {
 
 	// ExitProg is called when exiting the prog production.
 	ExitProg(c *ProgContext)
+
+	// ExitExpr is called when exiting the expr production.
+	ExitExpr(c *ExprContext)
 
 	// ExitJsonObjectExpr is called when exiting the JsonObjectExpr production.
 	ExitJsonObjectExpr(c *JsonObjectExprContext)

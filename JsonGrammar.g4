@@ -2,9 +2,12 @@ grammar JsonGrammar;
 
 prog: expr;
 
-expr: json_object #JsonObjectExpr
+expr: json_expr EOF;
+
+json_expr: json_object #JsonObjectExpr
     | json_array  #JsonArrayExpr
     ;
+
 
 /* Parser */
 
@@ -24,8 +27,8 @@ json_value
 
 /* Lexer */
 
-INT: [0-9]+ ;
-FLOAT: [0-9]+ '.' [0-9]+ ;
+INT: [1-9]+[0-9]* ;
+FLOAT: [1-9]+[0-9]* '.' [0-9]+ ;
 STRING: ('"' (~["\t\r\n] | '\\' . )* '"' );
 BOOL: 'true' | 'false' ;
 NULL: 'null' ;

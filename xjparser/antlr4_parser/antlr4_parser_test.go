@@ -14,14 +14,20 @@ func TestInvalidString(t *testing.T) {
 	assert.True(t, ok)
 }
 
-/*
-	func TestNoTopLevelObject(t *testing.T) {
-		_, err := Parse("{},{}")
-		_, ok := err.(JsonParsingError)
-		assert.NotNil(t, err)
-		assert.True(t, ok)
-	}
-*/
+func TestNoTopLevelObject(t *testing.T) {
+	_, err := Parse("{},{}")
+	_, ok := err.(JsonParsingError)
+	assert.NotNil(t, err)
+	assert.True(t, ok)
+}
+
+func TestMultipleTopLevelObject(t *testing.T) {
+	_, err := Parse("{}{}")
+	_, ok := err.(JsonParsingError)
+	assert.NotNil(t, err)
+	assert.True(t, ok)
+}
+
 func TestEmptyObjectWithNoWhiteSpaces(t *testing.T) {
 	json, err := Parse("{}")
 	assert.Nil(t, err)

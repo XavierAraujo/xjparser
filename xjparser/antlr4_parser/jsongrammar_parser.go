@@ -39,34 +39,37 @@ func jsongrammarParserInit() {
 		"WS",
 	}
 	staticData.RuleNames = []string{
-		"prog", "expr", "json_key_value", "json_object", "json_array", "json_value",
+		"prog", "expr", "json_expr", "json_key_value", "json_object", "json_array",
+		"json_value",
 	}
 	staticData.PredictionContextCache = antlr.NewPredictionContextCache()
 	staticData.serializedATN = []int32{
-		4, 1, 12, 58, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
-		4, 2, 5, 7, 5, 1, 0, 1, 0, 1, 1, 1, 1, 3, 1, 17, 8, 1, 1, 2, 1, 2, 1, 2,
-		1, 2, 1, 3, 1, 3, 1, 3, 1, 3, 5, 3, 27, 8, 3, 10, 3, 12, 3, 30, 9, 3, 3,
-		3, 32, 8, 3, 1, 3, 1, 3, 1, 4, 1, 4, 1, 4, 1, 4, 5, 4, 40, 8, 4, 10, 4,
-		12, 4, 43, 9, 4, 3, 4, 45, 8, 4, 1, 4, 1, 4, 1, 5, 1, 5, 1, 5, 1, 5, 1,
-		5, 1, 5, 1, 5, 3, 5, 56, 8, 5, 1, 5, 0, 0, 6, 0, 2, 4, 6, 8, 10, 0, 0,
-		62, 0, 12, 1, 0, 0, 0, 2, 16, 1, 0, 0, 0, 4, 18, 1, 0, 0, 0, 6, 22, 1,
-		0, 0, 0, 8, 35, 1, 0, 0, 0, 10, 55, 1, 0, 0, 0, 12, 13, 3, 2, 1, 0, 13,
-		1, 1, 0, 0, 0, 14, 17, 3, 6, 3, 0, 15, 17, 3, 8, 4, 0, 16, 14, 1, 0, 0,
-		0, 16, 15, 1, 0, 0, 0, 17, 3, 1, 0, 0, 0, 18, 19, 5, 9, 0, 0, 19, 20, 5,
-		1, 0, 0, 20, 21, 3, 10, 5, 0, 21, 5, 1, 0, 0, 0, 22, 31, 5, 2, 0, 0, 23,
-		28, 3, 4, 2, 0, 24, 25, 5, 3, 0, 0, 25, 27, 3, 4, 2, 0, 26, 24, 1, 0, 0,
-		0, 27, 30, 1, 0, 0, 0, 28, 26, 1, 0, 0, 0, 28, 29, 1, 0, 0, 0, 29, 32,
-		1, 0, 0, 0, 30, 28, 1, 0, 0, 0, 31, 23, 1, 0, 0, 0, 31, 32, 1, 0, 0, 0,
-		32, 33, 1, 0, 0, 0, 33, 34, 5, 4, 0, 0, 34, 7, 1, 0, 0, 0, 35, 44, 5, 5,
-		0, 0, 36, 41, 3, 6, 3, 0, 37, 38, 5, 3, 0, 0, 38, 40, 3, 6, 3, 0, 39, 37,
-		1, 0, 0, 0, 40, 43, 1, 0, 0, 0, 41, 39, 1, 0, 0, 0, 41, 42, 1, 0, 0, 0,
-		42, 45, 1, 0, 0, 0, 43, 41, 1, 0, 0, 0, 44, 36, 1, 0, 0, 0, 44, 45, 1,
-		0, 0, 0, 45, 46, 1, 0, 0, 0, 46, 47, 5, 6, 0, 0, 47, 9, 1, 0, 0, 0, 48,
-		56, 5, 7, 0, 0, 49, 56, 5, 8, 0, 0, 50, 56, 5, 9, 0, 0, 51, 56, 5, 10,
-		0, 0, 52, 56, 5, 11, 0, 0, 53, 56, 3, 6, 3, 0, 54, 56, 3, 8, 4, 0, 55,
-		48, 1, 0, 0, 0, 55, 49, 1, 0, 0, 0, 55, 50, 1, 0, 0, 0, 55, 51, 1, 0, 0,
-		0, 55, 52, 1, 0, 0, 0, 55, 53, 1, 0, 0, 0, 55, 54, 1, 0, 0, 0, 56, 11,
-		1, 0, 0, 0, 6, 16, 28, 31, 41, 44, 55,
+		4, 1, 12, 63, 2, 0, 7, 0, 2, 1, 7, 1, 2, 2, 7, 2, 2, 3, 7, 3, 2, 4, 7,
+		4, 2, 5, 7, 5, 2, 6, 7, 6, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 3,
+		2, 22, 8, 2, 1, 3, 1, 3, 1, 3, 1, 3, 1, 4, 1, 4, 1, 4, 1, 4, 5, 4, 32,
+		8, 4, 10, 4, 12, 4, 35, 9, 4, 3, 4, 37, 8, 4, 1, 4, 1, 4, 1, 5, 1, 5, 1,
+		5, 1, 5, 5, 5, 45, 8, 5, 10, 5, 12, 5, 48, 9, 5, 3, 5, 50, 8, 5, 1, 5,
+		1, 5, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 1, 6, 3, 6, 61, 8, 6, 1, 6, 0,
+		0, 7, 0, 2, 4, 6, 8, 10, 12, 0, 0, 66, 0, 14, 1, 0, 0, 0, 2, 16, 1, 0,
+		0, 0, 4, 21, 1, 0, 0, 0, 6, 23, 1, 0, 0, 0, 8, 27, 1, 0, 0, 0, 10, 40,
+		1, 0, 0, 0, 12, 60, 1, 0, 0, 0, 14, 15, 3, 2, 1, 0, 15, 1, 1, 0, 0, 0,
+		16, 17, 3, 4, 2, 0, 17, 18, 5, 0, 0, 1, 18, 3, 1, 0, 0, 0, 19, 22, 3, 8,
+		4, 0, 20, 22, 3, 10, 5, 0, 21, 19, 1, 0, 0, 0, 21, 20, 1, 0, 0, 0, 22,
+		5, 1, 0, 0, 0, 23, 24, 5, 9, 0, 0, 24, 25, 5, 1, 0, 0, 25, 26, 3, 12, 6,
+		0, 26, 7, 1, 0, 0, 0, 27, 36, 5, 2, 0, 0, 28, 33, 3, 6, 3, 0, 29, 30, 5,
+		3, 0, 0, 30, 32, 3, 6, 3, 0, 31, 29, 1, 0, 0, 0, 32, 35, 1, 0, 0, 0, 33,
+		31, 1, 0, 0, 0, 33, 34, 1, 0, 0, 0, 34, 37, 1, 0, 0, 0, 35, 33, 1, 0, 0,
+		0, 36, 28, 1, 0, 0, 0, 36, 37, 1, 0, 0, 0, 37, 38, 1, 0, 0, 0, 38, 39,
+		5, 4, 0, 0, 39, 9, 1, 0, 0, 0, 40, 49, 5, 5, 0, 0, 41, 46, 3, 8, 4, 0,
+		42, 43, 5, 3, 0, 0, 43, 45, 3, 8, 4, 0, 44, 42, 1, 0, 0, 0, 45, 48, 1,
+		0, 0, 0, 46, 44, 1, 0, 0, 0, 46, 47, 1, 0, 0, 0, 47, 50, 1, 0, 0, 0, 48,
+		46, 1, 0, 0, 0, 49, 41, 1, 0, 0, 0, 49, 50, 1, 0, 0, 0, 50, 51, 1, 0, 0,
+		0, 51, 52, 5, 6, 0, 0, 52, 11, 1, 0, 0, 0, 53, 61, 5, 7, 0, 0, 54, 61,
+		5, 8, 0, 0, 55, 61, 5, 9, 0, 0, 56, 61, 5, 10, 0, 0, 57, 61, 5, 11, 0,
+		0, 58, 61, 3, 8, 4, 0, 59, 61, 3, 10, 5, 0, 60, 53, 1, 0, 0, 0, 60, 54,
+		1, 0, 0, 0, 60, 55, 1, 0, 0, 0, 60, 56, 1, 0, 0, 0, 60, 57, 1, 0, 0, 0,
+		60, 58, 1, 0, 0, 0, 60, 59, 1, 0, 0, 0, 61, 13, 1, 0, 0, 0, 6, 21, 33,
+		36, 46, 49, 60,
 	}
 	deserializer := antlr.NewATNDeserializer(nil)
 	staticData.atn = deserializer.Deserialize(staticData.serializedATN)
@@ -123,10 +126,11 @@ const (
 const (
 	JsonGrammarParserRULE_prog           = 0
 	JsonGrammarParserRULE_expr           = 1
-	JsonGrammarParserRULE_json_key_value = 2
-	JsonGrammarParserRULE_json_object    = 3
-	JsonGrammarParserRULE_json_array     = 4
-	JsonGrammarParserRULE_json_value     = 5
+	JsonGrammarParserRULE_json_expr      = 2
+	JsonGrammarParserRULE_json_key_value = 3
+	JsonGrammarParserRULE_json_object    = 4
+	JsonGrammarParserRULE_json_array     = 5
+	JsonGrammarParserRULE_json_value     = 6
 )
 
 // IProgContext is an interface to support dynamic dispatch.
@@ -216,7 +220,7 @@ func (p *JsonGrammarParser) Prog() (localctx IProgContext) {
 	p.EnterRule(localctx, 0, JsonGrammarParserRULE_prog)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(12)
+		p.SetState(14)
 		p.Expr()
 	}
 
@@ -239,6 +243,11 @@ type IExprContext interface {
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
+
+	// Getter signatures
+	Json_expr() IJson_exprContext
+	EOF() antlr.TerminalNode
+
 	// IsExprContext differentiates from other interfaces.
 	IsExprContext()
 }
@@ -275,8 +284,24 @@ func NewExprContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokin
 
 func (s *ExprContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *ExprContext) CopyAll(ctx *ExprContext) {
-	s.CopyFrom(&ctx.BaseParserRuleContext)
+func (s *ExprContext) Json_expr() IJson_exprContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IJson_exprContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IJson_exprContext)
+}
+
+func (s *ExprContext) EOF() antlr.TerminalNode {
+	return s.GetToken(JsonGrammarParserEOF, 0)
 }
 
 func (s *ExprContext) GetRuleContext() antlr.RuleContext {
@@ -287,16 +312,112 @@ func (s *ExprContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) s
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
+func (s *ExprContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(JsonGrammarListener); ok {
+		listenerT.EnterExpr(s)
+	}
+}
+
+func (s *ExprContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(JsonGrammarListener); ok {
+		listenerT.ExitExpr(s)
+	}
+}
+
+func (p *JsonGrammarParser) Expr() (localctx IExprContext) {
+	localctx = NewExprContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 2, JsonGrammarParserRULE_expr)
+	p.EnterOuterAlt(localctx, 1)
+	{
+		p.SetState(16)
+		p.Json_expr()
+	}
+	{
+		p.SetState(17)
+		p.Match(JsonGrammarParserEOF)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+
+errorExit:
+	if p.HasError() {
+		v := p.GetError()
+		localctx.SetException(v)
+		p.GetErrorHandler().ReportError(p, v)
+		p.GetErrorHandler().Recover(p, v)
+		p.SetError(nil)
+	}
+	p.ExitRule()
+	return localctx
+	goto errorExit // Trick to prevent compiler error if the label is not used
+}
+
+// IJson_exprContext is an interface to support dynamic dispatch.
+type IJson_exprContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+	// IsJson_exprContext differentiates from other interfaces.
+	IsJson_exprContext()
+}
+
+type Json_exprContext struct {
+	antlr.BaseParserRuleContext
+	parser antlr.Parser
+}
+
+func NewEmptyJson_exprContext() *Json_exprContext {
+	var p = new(Json_exprContext)
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
+	p.RuleIndex = JsonGrammarParserRULE_json_expr
+	return p
+}
+
+func InitEmptyJson_exprContext(p *Json_exprContext) {
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
+	p.RuleIndex = JsonGrammarParserRULE_json_expr
+}
+
+func (*Json_exprContext) IsJson_exprContext() {}
+
+func NewJson_exprContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Json_exprContext {
+	var p = new(Json_exprContext)
+
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
+
+	p.parser = parser
+	p.RuleIndex = JsonGrammarParserRULE_json_expr
+
+	return p
+}
+
+func (s *Json_exprContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *Json_exprContext) CopyAll(ctx *Json_exprContext) {
+	s.CopyFrom(&ctx.BaseParserRuleContext)
+}
+
+func (s *Json_exprContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *Json_exprContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
 type JsonArrayExprContext struct {
-	ExprContext
+	Json_exprContext
 }
 
 func NewJsonArrayExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *JsonArrayExprContext {
 	var p = new(JsonArrayExprContext)
 
-	InitEmptyExprContext(&p.ExprContext)
+	InitEmptyJson_exprContext(&p.Json_exprContext)
 	p.parser = parser
-	p.CopyAll(ctx.(*ExprContext))
+	p.CopyAll(ctx.(*Json_exprContext))
 
 	return p
 }
@@ -334,15 +455,15 @@ func (s *JsonArrayExprContext) ExitRule(listener antlr.ParseTreeListener) {
 }
 
 type JsonObjectExprContext struct {
-	ExprContext
+	Json_exprContext
 }
 
 func NewJsonObjectExprContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *JsonObjectExprContext {
 	var p = new(JsonObjectExprContext)
 
-	InitEmptyExprContext(&p.ExprContext)
+	InitEmptyJson_exprContext(&p.Json_exprContext)
 	p.parser = parser
-	p.CopyAll(ctx.(*ExprContext))
+	p.CopyAll(ctx.(*Json_exprContext))
 
 	return p
 }
@@ -379,10 +500,10 @@ func (s *JsonObjectExprContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
-func (p *JsonGrammarParser) Expr() (localctx IExprContext) {
-	localctx = NewExprContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 2, JsonGrammarParserRULE_expr)
-	p.SetState(16)
+func (p *JsonGrammarParser) Json_expr() (localctx IJson_exprContext) {
+	localctx = NewJson_exprContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 4, JsonGrammarParserRULE_json_expr)
+	p.SetState(21)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -393,7 +514,7 @@ func (p *JsonGrammarParser) Expr() (localctx IExprContext) {
 		localctx = NewJsonObjectExprContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(14)
+			p.SetState(19)
 			p.Json_object()
 		}
 
@@ -401,7 +522,7 @@ func (p *JsonGrammarParser) Expr() (localctx IExprContext) {
 		localctx = NewJsonArrayExprContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(15)
+			p.SetState(20)
 			p.Json_array()
 		}
 
@@ -534,10 +655,10 @@ func (s *Json_key_valueContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *JsonGrammarParser) Json_key_value() (localctx IJson_key_valueContext) {
 	localctx = NewJson_key_valueContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 4, JsonGrammarParserRULE_json_key_value)
+	p.EnterRule(localctx, 6, JsonGrammarParserRULE_json_key_value)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(18)
+		p.SetState(23)
 
 		var _m = p.Match(JsonGrammarParserSTRING)
 
@@ -548,7 +669,7 @@ func (p *JsonGrammarParser) Json_key_value() (localctx IJson_key_valueContext) {
 		}
 	}
 	{
-		p.SetState(19)
+		p.SetState(24)
 		p.Match(JsonGrammarParserT__0)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -556,7 +677,7 @@ func (p *JsonGrammarParser) Json_key_value() (localctx IJson_key_valueContext) {
 		}
 	}
 	{
-		p.SetState(20)
+		p.SetState(25)
 
 		var _x = p.Json_value()
 
@@ -686,19 +807,19 @@ func (s *Json_objectContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *JsonGrammarParser) Json_object() (localctx IJson_objectContext) {
 	localctx = NewJson_objectContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 6, JsonGrammarParserRULE_json_object)
+	p.EnterRule(localctx, 8, JsonGrammarParserRULE_json_object)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(22)
+		p.SetState(27)
 		p.Match(JsonGrammarParserT__1)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-	p.SetState(31)
+	p.SetState(36)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -707,10 +828,10 @@ func (p *JsonGrammarParser) Json_object() (localctx IJson_objectContext) {
 
 	if _la == JsonGrammarParserSTRING {
 		{
-			p.SetState(23)
+			p.SetState(28)
 			p.Json_key_value()
 		}
-		p.SetState(28)
+		p.SetState(33)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -719,7 +840,7 @@ func (p *JsonGrammarParser) Json_object() (localctx IJson_objectContext) {
 
 		for _la == JsonGrammarParserT__2 {
 			{
-				p.SetState(24)
+				p.SetState(29)
 				p.Match(JsonGrammarParserT__2)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -727,11 +848,11 @@ func (p *JsonGrammarParser) Json_object() (localctx IJson_objectContext) {
 				}
 			}
 			{
-				p.SetState(25)
+				p.SetState(30)
 				p.Json_key_value()
 			}
 
-			p.SetState(30)
+			p.SetState(35)
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -741,7 +862,7 @@ func (p *JsonGrammarParser) Json_object() (localctx IJson_objectContext) {
 
 	}
 	{
-		p.SetState(33)
+		p.SetState(38)
 		p.Match(JsonGrammarParserT__3)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -872,19 +993,19 @@ func (s *Json_arrayContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *JsonGrammarParser) Json_array() (localctx IJson_arrayContext) {
 	localctx = NewJson_arrayContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 8, JsonGrammarParserRULE_json_array)
+	p.EnterRule(localctx, 10, JsonGrammarParserRULE_json_array)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(35)
+		p.SetState(40)
 		p.Match(JsonGrammarParserT__4)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-	p.SetState(44)
+	p.SetState(49)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -893,10 +1014,10 @@ func (p *JsonGrammarParser) Json_array() (localctx IJson_arrayContext) {
 
 	if _la == JsonGrammarParserT__1 {
 		{
-			p.SetState(36)
+			p.SetState(41)
 			p.Json_object()
 		}
-		p.SetState(41)
+		p.SetState(46)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -905,7 +1026,7 @@ func (p *JsonGrammarParser) Json_array() (localctx IJson_arrayContext) {
 
 		for _la == JsonGrammarParserT__2 {
 			{
-				p.SetState(37)
+				p.SetState(42)
 				p.Match(JsonGrammarParserT__2)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -913,11 +1034,11 @@ func (p *JsonGrammarParser) Json_array() (localctx IJson_arrayContext) {
 				}
 			}
 			{
-				p.SetState(38)
+				p.SetState(43)
 				p.Json_object()
 			}
 
-			p.SetState(43)
+			p.SetState(48)
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -927,7 +1048,7 @@ func (p *JsonGrammarParser) Json_array() (localctx IJson_arrayContext) {
 
 	}
 	{
-		p.SetState(46)
+		p.SetState(51)
 		p.Match(JsonGrammarParserT__5)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -1266,8 +1387,8 @@ func (s *ArrayValueContext) ExitRule(listener antlr.ParseTreeListener) {
 
 func (p *JsonGrammarParser) Json_value() (localctx IJson_valueContext) {
 	localctx = NewJson_valueContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 10, JsonGrammarParserRULE_json_value)
-	p.SetState(55)
+	p.EnterRule(localctx, 12, JsonGrammarParserRULE_json_value)
+	p.SetState(60)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -1278,7 +1399,7 @@ func (p *JsonGrammarParser) Json_value() (localctx IJson_valueContext) {
 		localctx = NewIntValueContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(48)
+			p.SetState(53)
 			p.Match(JsonGrammarParserINT)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -1290,7 +1411,7 @@ func (p *JsonGrammarParser) Json_value() (localctx IJson_valueContext) {
 		localctx = NewFloatValueContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(49)
+			p.SetState(54)
 			p.Match(JsonGrammarParserFLOAT)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -1302,7 +1423,7 @@ func (p *JsonGrammarParser) Json_value() (localctx IJson_valueContext) {
 		localctx = NewStringValueContext(p, localctx)
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(50)
+			p.SetState(55)
 			p.Match(JsonGrammarParserSTRING)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -1314,7 +1435,7 @@ func (p *JsonGrammarParser) Json_value() (localctx IJson_valueContext) {
 		localctx = NewBoolValueContext(p, localctx)
 		p.EnterOuterAlt(localctx, 4)
 		{
-			p.SetState(51)
+			p.SetState(56)
 			p.Match(JsonGrammarParserBOOL)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -1326,7 +1447,7 @@ func (p *JsonGrammarParser) Json_value() (localctx IJson_valueContext) {
 		localctx = NewNullValueContext(p, localctx)
 		p.EnterOuterAlt(localctx, 5)
 		{
-			p.SetState(52)
+			p.SetState(57)
 			p.Match(JsonGrammarParserNULL)
 			if p.HasError() {
 				// Recognition error - abort rule
@@ -1338,7 +1459,7 @@ func (p *JsonGrammarParser) Json_value() (localctx IJson_valueContext) {
 		localctx = NewObjectValueContext(p, localctx)
 		p.EnterOuterAlt(localctx, 6)
 		{
-			p.SetState(53)
+			p.SetState(58)
 			p.Json_object()
 		}
 
@@ -1346,7 +1467,7 @@ func (p *JsonGrammarParser) Json_value() (localctx IJson_valueContext) {
 		localctx = NewArrayValueContext(p, localctx)
 		p.EnterOuterAlt(localctx, 7)
 		{
-			p.SetState(54)
+			p.SetState(59)
 			p.Json_array()
 		}
 
