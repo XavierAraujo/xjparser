@@ -60,23 +60,23 @@ func (jsonObject *JsonObject) String() string {
 /* Json Array */
 
 type JsonArray struct {
-	values []JsonObject
+	values []JsonValue
 }
 
 func NewJsonArray() *JsonArray {
-	return &JsonArray{values: make([]JsonObject, 0)}
+	return &JsonArray{values: make([]JsonValue, 0)}
 }
 
 func (jsonArray *JsonArray) GetType() JSON_TYPE {
 	return JSON_ARRAY
 }
 
-func (jsonArray *JsonArray) GetIndex(index int) JsonObject {
+func (jsonArray *JsonArray) GetIndex(index int) JsonValue {
 	return jsonArray.values[index]
 }
 
-func (jsonArray *JsonArray) Add(jsonObject JsonObject) {
-	jsonArray.values = append(jsonArray.values, jsonObject)
+func (jsonArray *JsonArray) Add(jsonValue JsonValue) {
+	jsonArray.values = append(jsonArray.values, jsonValue)
 }
 
 func (jsonArray *JsonArray) String() string {

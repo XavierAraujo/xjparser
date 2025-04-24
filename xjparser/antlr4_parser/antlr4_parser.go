@@ -54,21 +54,6 @@ func (listener *BasicJsonGrammarListener) EnterJsonArrayExpr(ctx *JsonArrayExprC
 	listener.topLevelElement = topLevelArray
 }
 
-func (listener *BasicJsonGrammarListener) EnterJson_object(ctx *Json_objectContext) {
-	jsonArray, ok := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
-	if !ok {
-		// Ignore. If the top of the stack is not an array this object was already
-		// initialized when EnterJson_key_value() was called.
-		return
-	}
-
-	// If we are inside an array and a new object is found we need to initialize it
-	// and put on the top of visiting stack.
-	newObject := xjparser.NewJsonObject()
-	listener.currentEntityStack.Push(newObject)
-	jsonArray.Add(*newObject)
-}
-
 func (listener *BasicJsonGrammarListener) ExitJson_object(ctx *Json_objectContext) {
 	listener.currentEntityStack.Pop()
 }
@@ -99,10 +84,7 @@ func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *Json_key_valu
 		strValue := getStringTokenWithoutQuotes(ctx.value.GetText())
 		currentObject.SetKey(key, xjparser.NewJsonStr(strValue))
 	case *BoolValueContext:
-		boolValue := true
-		if ctx.value.GetText() == "false" {
-			boolValue = false
-		}
+		boolValue := boolStr2Bool(ctx.value.GetText())
 		currentObject.SetKey(key, xjparser.NewJsonBool(boolValue))
 	case *NullValueContext:
 		currentObject.SetKey(key, xjparser.NewJsonNull())
@@ -121,6 +103,113 @@ func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *Json_key_valu
 	default:
 		log.Panic(JsonParsingError{"Unexpected JSON type"})
 	}
+}
+
+func (listener *BasicJsonGrammarListener) EnterIntValue(ctx *IntValueContext) {
+	_, ok := ctx.GetParent().(*Json_key_valueContext)
+	if ok {
+		// If the parent of this value is a json_key_value rule then this
+		// was already processed on entering that rule and we can just
+		// ignore it
+		return
+	}
+
+	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	intValue, _ := strconv.ParseInt(ctx.GetText(), 10, 64)
+	jsonArray.Add(xjparser.NewJsonInt(intValue))
+}
+
+func (listener *BasicJsonGrammarListener) EnterFloatValue(ctx *FloatValueContext) {
+	_, ok := ctx.GetParent().(*Json_key_valueContext)
+	if ok {
+		// If the parent of this value is a json_key_value rule then this
+		// was already processed on entering that rule and we can just
+		// ignore it
+		return
+	}
+
+	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	floatValue, _ := strconv.ParseFloat(ctx.GetText(), 64)
+	jsonArray.Add(xjparser.NewJsonFloat(floatValue))
+}
+
+func (listener *BasicJsonGrammarListener) EnterStringValue(ctx *StringValueContext) {
+	_, ok := ctx.GetParent().(*Json_key_valueContext)
+	if ok {
+		// If the parent of this value is a json_key_value rule then this
+		// was already processed on entering that rule and we can just
+		// ignore it
+		return
+	}
+
+	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	strValue := getStringTokenWithoutQuotes(ctx.GetText())
+	jsonArray.Add(xjparser.NewJsonStr(strValue))
+}
+
+func (listener *BasicJsonGrammarListener) EnterBoolValue(ctx *BoolValueContext) {
+	_, ok := ctx.GetParent().(*Json_key_valueContext)
+	if ok {
+		// If the parent of this value is a json_key_value rule then this
+		// was already processed on entering that rule and we can just
+		// ignore it
+		return
+	}
+
+	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	boolValue := boolStr2Bool(ctx.GetText())
+	jsonArray.Add(xjparser.NewJsonBool(boolValue))
+}
+
+func (listener *BasicJsonGrammarListener) EnterNullValue(ctx *NullValueContext) {
+	_, ok := ctx.GetParent().(*Json_key_valueContext)
+	if ok {
+		// If the parent of this value is a json_key_value rule then this
+		// was already processed on entering that rule and we can just
+		// ignore it
+		return
+	}
+
+	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	jsonArray.Add(xjparser.NewJsonNull())
+}
+
+func (listener *BasicJsonGrammarListener) EnterObjectValue(ctx *ObjectValueContext) {
+	_, ok := ctx.GetParent().(*Json_key_valueContext)
+	if ok {
+		// If the parent of this value is a json_key_value rule then this
+		// was already processed on entering that rule and we can just
+		// ignore it
+		return
+	}
+
+	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	newObject := xjparser.NewJsonObject()
+	jsonArray.Add(newObject)
+	listener.currentEntityStack.Push(newObject)
+}
+
+func (listener *BasicJsonGrammarListener) EnterArrayValue(ctx *ArrayValueContext) {
+	_, ok := ctx.GetParent().(*Json_key_valueContext)
+	if ok {
+		// If the parent of this value is a json_key_value rule then this
+		// was already processed on entering that rule and we can just
+		// ignore it
+		return
+	}
+
+	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	newArray := xjparser.NewJsonArray()
+	jsonArray.Add(newArray)
+	listener.currentEntityStack.Push(newArray)
+}
+
+func boolStr2Bool(boolStr string) bool {
+	boolValue := true
+	if boolStr == "false" {
+		boolValue = false
+	}
+	return boolValue
 }
 
 func getStringTokenWithoutQuotes(stringToken string) string {

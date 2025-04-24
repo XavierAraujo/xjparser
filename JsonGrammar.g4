@@ -13,7 +13,7 @@ json_expr: json_object #JsonObjectExpr
 
 json_key_value: (key=STRING ':' value=json_value);
 json_object: '{' (json_key_value (',' json_key_value)*)? '}';
-json_array: '[' (json_object (',' json_object)*)? ']';
+json_array: '[' (json_value (',' json_value)*)? ']';
 json_value
     : INT          #IntValue
     | FLOAT        #FloatValue

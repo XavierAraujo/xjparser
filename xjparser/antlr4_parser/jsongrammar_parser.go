@@ -60,8 +60,8 @@ func jsongrammarParserInit() {
 		3, 0, 0, 30, 32, 3, 6, 3, 0, 31, 29, 1, 0, 0, 0, 32, 35, 1, 0, 0, 0, 33,
 		31, 1, 0, 0, 0, 33, 34, 1, 0, 0, 0, 34, 37, 1, 0, 0, 0, 35, 33, 1, 0, 0,
 		0, 36, 28, 1, 0, 0, 0, 36, 37, 1, 0, 0, 0, 37, 38, 1, 0, 0, 0, 38, 39,
-		5, 4, 0, 0, 39, 9, 1, 0, 0, 0, 40, 49, 5, 5, 0, 0, 41, 46, 3, 8, 4, 0,
-		42, 43, 5, 3, 0, 0, 43, 45, 3, 8, 4, 0, 44, 42, 1, 0, 0, 0, 45, 48, 1,
+		5, 4, 0, 0, 39, 9, 1, 0, 0, 0, 40, 49, 5, 5, 0, 0, 41, 46, 3, 12, 6, 0,
+		42, 43, 5, 3, 0, 0, 43, 45, 3, 12, 6, 0, 44, 42, 1, 0, 0, 0, 45, 48, 1,
 		0, 0, 0, 46, 44, 1, 0, 0, 0, 46, 47, 1, 0, 0, 0, 47, 50, 1, 0, 0, 0, 48,
 		46, 1, 0, 0, 0, 49, 41, 1, 0, 0, 0, 49, 50, 1, 0, 0, 0, 50, 51, 1, 0, 0,
 		0, 51, 52, 5, 6, 0, 0, 52, 11, 1, 0, 0, 0, 53, 61, 5, 7, 0, 0, 54, 61,
@@ -891,8 +891,8 @@ type IJson_arrayContext interface {
 	GetParser() antlr.Parser
 
 	// Getter signatures
-	AllJson_object() []IJson_objectContext
-	Json_object(i int) IJson_objectContext
+	AllJson_value() []IJson_valueContext
+	Json_value(i int) IJson_valueContext
 
 	// IsJson_arrayContext differentiates from other interfaces.
 	IsJson_arrayContext()
@@ -930,20 +930,20 @@ func NewJson_arrayContext(parser antlr.Parser, parent antlr.ParserRuleContext, i
 
 func (s *Json_arrayContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *Json_arrayContext) AllJson_object() []IJson_objectContext {
+func (s *Json_arrayContext) AllJson_value() []IJson_valueContext {
 	children := s.GetChildren()
 	len := 0
 	for _, ctx := range children {
-		if _, ok := ctx.(IJson_objectContext); ok {
+		if _, ok := ctx.(IJson_valueContext); ok {
 			len++
 		}
 	}
 
-	tst := make([]IJson_objectContext, len)
+	tst := make([]IJson_valueContext, len)
 	i := 0
 	for _, ctx := range children {
-		if t, ok := ctx.(IJson_objectContext); ok {
-			tst[i] = t.(IJson_objectContext)
+		if t, ok := ctx.(IJson_valueContext); ok {
+			tst[i] = t.(IJson_valueContext)
 			i++
 		}
 	}
@@ -951,11 +951,11 @@ func (s *Json_arrayContext) AllJson_object() []IJson_objectContext {
 	return tst
 }
 
-func (s *Json_arrayContext) Json_object(i int) IJson_objectContext {
+func (s *Json_arrayContext) Json_value(i int) IJson_valueContext {
 	var t antlr.RuleContext
 	j := 0
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IJson_objectContext); ok {
+		if _, ok := ctx.(IJson_valueContext); ok {
 			if j == i {
 				t = ctx.(antlr.RuleContext)
 				break
@@ -968,7 +968,7 @@ func (s *Json_arrayContext) Json_object(i int) IJson_objectContext {
 		return nil
 	}
 
-	return t.(IJson_objectContext)
+	return t.(IJson_valueContext)
 }
 
 func (s *Json_arrayContext) GetRuleContext() antlr.RuleContext {
@@ -1012,10 +1012,10 @@ func (p *JsonGrammarParser) Json_array() (localctx IJson_arrayContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	if _la == JsonGrammarParserT__1 {
+	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&4004) != 0 {
 		{
 			p.SetState(41)
-			p.Json_object()
+			p.Json_value()
 		}
 		p.SetState(46)
 		p.GetErrorHandler().Sync(p)
@@ -1035,7 +1035,7 @@ func (p *JsonGrammarParser) Json_array() (localctx IJson_arrayContext) {
 			}
 			{
 				p.SetState(43)
-				p.Json_object()
+				p.Json_value()
 			}
 
 			p.SetState(48)

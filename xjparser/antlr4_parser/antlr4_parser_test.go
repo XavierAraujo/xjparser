@@ -131,42 +131,88 @@ func TestArrayWithSingleObject(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, 1, jsonArray.Len())
 
-	jsonObject := jsonArray.GetIndex(0)
+	jsonObject, ok := jsonArray.GetIndex(0).(*xjparser.JsonObject)
+	assert.True(t, ok)
 	jsonInt := jsonObject.GetKey("key1").(*xjparser.JsonInt)
 	assert.True(t, ok)
 	assert.Equal(t, int64(1), jsonInt.Value())
 }
 
-func TestArraytWithAllBasicTypes(t *testing.T) {
+func TestArrayWithMultipleObjectsWithin(t *testing.T) {
 	json, err := Parse("[{\"key1\": 1}, {\"key2\": 2.2}, {\"key3\": false}, {\"key4\": \"value\"}, {\"key5\": null}]")
 	assert.Nil(t, err)
 	jsonArray, ok := (*json).(*xjparser.JsonArray)
 	assert.True(t, ok)
 	assert.Equal(t, 5, jsonArray.Len())
 
-	jsonObj := jsonArray.GetIndex(0)
+	jsonObj, ok := jsonArray.GetIndex(0).(*xjparser.JsonObject)
+	assert.True(t, ok)
 	jsonInt, ok := jsonObj.GetKey("key1").(*xjparser.JsonInt)
 	assert.True(t, ok)
 	assert.Equal(t, int64(1), jsonInt.Value())
 
-	jsonObj = jsonArray.GetIndex(1)
+	jsonObj, ok = jsonArray.GetIndex(1).(*xjparser.JsonObject)
+	assert.True(t, ok)
 	jsonFloat, ok := jsonObj.GetKey("key2").(*xjparser.JsonFloat)
 	assert.True(t, ok)
 	assert.Equal(t, float64(2.2), jsonFloat.Value())
 
-	jsonObj = jsonArray.GetIndex(2)
+	jsonObj, ok = jsonArray.GetIndex(2).(*xjparser.JsonObject)
+	assert.True(t, ok)
 	jsonBool, ok := jsonObj.GetKey("key3").(*xjparser.JsonBool)
 	assert.True(t, ok)
 	assert.Equal(t, false, jsonBool.Value())
 
-	jsonObj = jsonArray.GetIndex(3)
+	jsonObj, ok = jsonArray.GetIndex(3).(*xjparser.JsonObject)
+	assert.True(t, ok)
 	jsonStr, ok := jsonObj.GetKey("key4").(*xjparser.JsonStr)
 	assert.True(t, ok)
 	assert.Equal(t, "value", jsonStr.Value())
 
-	jsonObj = jsonArray.GetIndex(4)
+	jsonObj, ok = jsonArray.GetIndex(4).(*xjparser.JsonObject)
+	assert.True(t, ok)
 	jsonNull, ok := jsonObj.GetKey("key5").(*xjparser.JsonNull)
 	assert.NotNil(t, jsonNull)
+	assert.True(t, ok)
+}
+
+func TestArrayWithMultipleTypes(t *testing.T) {
+	json, err := Parse("[{\"key1\":\"value1\"}, [{\"key2\":\"value2\"}], 1, 1.1, true, \"plain-str\", null]")
+	assert.Nil(t, err)
+	jsonArray, ok := (*json).(*xjparser.JsonArray)
+	assert.True(t, ok)
+	assert.Equal(t, 7, jsonArray.Len())
+
+	jsonObj, ok := jsonArray.GetIndex(0).(*xjparser.JsonObject)
+	assert.True(t, ok)
+	jsonStr, ok := jsonObj.GetKey("key1").(*xjparser.JsonStr)
+	assert.True(t, ok)
+	assert.Equal(t, "value1", jsonStr.Value())
+
+	subJsonArray, ok := jsonArray.GetIndex(1).(*xjparser.JsonArray)
+	assert.True(t, ok)
+	jsonObj, ok = subJsonArray.GetIndex(0).(*xjparser.JsonObject)
+	jsonStr, ok = jsonObj.GetKey("key2").(*xjparser.JsonStr)
+	assert.True(t, ok)
+	assert.Equal(t, "value2", jsonStr.Value())
+
+	jsonInt, ok := jsonArray.GetIndex(2).(*xjparser.JsonInt)
+	assert.True(t, ok)
+	assert.Equal(t, int64(1), jsonInt.Value())
+
+	jsonFloat, ok := jsonArray.GetIndex(3).(*xjparser.JsonFloat)
+	assert.True(t, ok)
+	assert.Equal(t, float64(1.1), jsonFloat.Value())
+
+	jsonBool, ok := jsonArray.GetIndex(4).(*xjparser.JsonBool)
+	assert.True(t, ok)
+	assert.Equal(t, true, jsonBool.Value())
+
+	jsonStr, ok = jsonArray.GetIndex(5).(*xjparser.JsonStr)
+	assert.True(t, ok)
+	assert.Equal(t, "plain-str", jsonStr.Value())
+
+	_, ok = jsonArray.GetIndex(6).(*xjparser.JsonNull)
 	assert.True(t, ok)
 }
 
@@ -197,15 +243,17 @@ func TestNestedObjectsAndArrays(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, 2, jsonArray.Len())
 
-	jsonArrayElem1 := jsonArray.GetIndex(0)
-	assert.Equal(t, 1, jsonArrayElem1.Len())
-	jsonArrayElem1Value, ok := jsonArrayElem1.GetKey("key6").(*xjparser.JsonStr)
+	jsonArrayObj1, ok := jsonArray.GetIndex(0).(*xjparser.JsonObject)
+	assert.True(t, ok)
+	assert.Equal(t, 1, jsonArrayObj1.Len())
+	jsonArrayElem1Value, ok := jsonArrayObj1.GetKey("key6").(*xjparser.JsonStr)
 	assert.True(t, ok)
 	assert.Equal(t, "arrayValue1", jsonArrayElem1Value.Value())
 
-	jsonArrayElem2 := jsonArray.GetIndex(1)
-	assert.Equal(t, 1, jsonArrayElem2.Len())
-	jsonArrayElem2Value, ok := jsonArrayElem2.GetKey("key7").(*xjparser.JsonStr)
+	jsonArrayObj2, ok := jsonArray.GetIndex(1).(*xjparser.JsonObject)
+	assert.True(t, ok)
+	assert.Equal(t, 1, jsonArrayObj2.Len())
+	jsonArrayElem2Value, ok := jsonArrayObj2.GetKey("key7").(*xjparser.JsonStr)
 	assert.True(t, ok)
 	assert.Equal(t, "arrayValue2", jsonArrayElem2Value.Value())
 }
