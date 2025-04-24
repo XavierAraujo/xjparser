@@ -273,3 +273,20 @@ func TestObjectEditingByReference(t *testing.T) {
 	jsonIntAfter, ok := jsonObject2.GetKey("key2").(*xjparser.JsonInt)
 	assert.Equal(t, int64(2), jsonIntAfter.Value())
 }
+
+
+func TestNegativeValues(t *testing.T) {
+	json, err := Parse("{\"key1\": -100, \"key2\": -200.5, \"key3\": false, \"key4\": \"value\", \"key5\": null}")
+	assert.Nil(t, err)
+	jsonObject, ok := (*json).(*xjparser.JsonObject)
+	assert.True(t, ok)
+	assert.Equal(t, 5, jsonObject.Len())
+
+	jsonInt, ok := jsonObject.GetKey("key1").(*xjparser.JsonInt)
+	assert.True(t, ok)
+	assert.Equal(t, int64(-100), jsonInt.Value())
+
+	jsonFloat, ok := jsonObject.GetKey("key2").(*xjparser.JsonFloat)
+	assert.True(t, ok)
+	assert.Equal(t, float64(-200.5), jsonFloat.Value())
+}
