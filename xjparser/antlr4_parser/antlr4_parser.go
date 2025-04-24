@@ -9,10 +9,10 @@ import (
 	"github.com/golang-collections/collections/stack"
 )
 
-func Parse(inputStr string) (jsonType *xjparser.JsonValue, err error) {
+func Parse(inputStr string) (jsonValue *xjparser.JsonValue, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			jsonType = nil
+			jsonValue = nil
 			err = r.(error)
 		}
 	}()
@@ -23,6 +23,7 @@ func Parse(inputStr string) (jsonType *xjparser.JsonValue, err error) {
 	lexer := NewJsonGrammarLexer(input)
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(&errorListener)
+
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	parser := NewJsonGrammarParser(stream)
 	parser.RemoveErrorListeners()
