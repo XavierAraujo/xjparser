@@ -1,13 +1,18 @@
 package antlr4_parser
 
 import (
-	"log"
 	"strconv"
 	"xjparser/xjparser"
+	"xjparser/xjparser/util"
 
 	"github.com/antlr4-go/antlr/v4"
-	"github.com/golang-collections/collections/stack"
 )
+
+type BasicJsonGrammarListener struct {
+	*BaseJsonGrammarListener
+	topLevelElement xjparser.JsonValue
+	entityStack     *util.Stack[xjparser.JsonValue]
+}
 
 func Parse(inputStr string) (jsonValue *xjparser.JsonValue, err error) {
 	defer func() {
@@ -29,43 +34,44 @@ func Parse(inputStr string) (jsonValue *xjparser.JsonValue, err error) {
 	parser.RemoveErrorListeners()
 	parser.AddErrorListener(&errorListener)
 
-	listener := &BasicJsonGrammarListener{}
+	listener := &BasicJsonGrammarListener{entityStack: util.NewStack[xjparser.JsonValue]()}
 	antlr.ParseTreeWalkerDefault.Walk(listener, parser.Expr())
 	return &listener.topLevelElement, nil
-}
-
-type BasicJsonGrammarListener struct {
-	*BaseJsonGrammarListener
-	topLevelElement    xjparser.JsonValue
-	currentEntityStack stack.Stack
 }
 
 func (listener *BasicJsonGrammarListener) EnterJsonObjectExpr(ctx *JsonObjectExprContext) {
 	// top level object
 	topLevelObject := xjparser.NewJsonObject()
-	listener.currentEntityStack.Push(topLevelObject)
+	listener.entityStack.Push(topLevelObject)
 	listener.topLevelElement = topLevelObject
 }
 
 func (listener *BasicJsonGrammarListener) EnterJsonArrayExpr(ctx *JsonArrayExprContext) {
 	// top level array
 	topLevelArray := xjparser.NewJsonArray()
-	listener.currentEntityStack.Push(topLevelArray)
+	listener.entityStack.Push(topLevelArray)
 	listener.topLevelElement = topLevelArray
 }
 
 func (listener *BasicJsonGrammarListener) ExitJson_object(ctx *Json_objectContext) {
-	listener.currentEntityStack.Pop()
+	listener.entityStack.Pop()
 }
 
 func (listener *BasicJsonGrammarListener) ExitJson_array(ctx *Json_arrayContext) {
-	listener.currentEntityStack.Pop()
+	listener.entityStack.Pop()
 }
 
 func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *Json_key_valueContext) {
 	// Add newly found key-value pair to the current entity
-	currentObject := listener.currentEntityStack.Peek().(*xjparser.JsonObject)
+	currentStackTop, err := listener.entityStack.Peek()
+	if err != nil {
+		// Should never happen due to the grammar constraints
+		panic(JsonParsingError{"Visiting stack is empty"})
+	}
 
+	// key-value pairs can only be found inside objects as defined in the grammar
+	// so this cast is already pre-validated by the grammar itself
+	currentObject := currentStackTop.(*xjparser.JsonObject)
 	key := getStringTokenWithoutQuotes(ctx.key.GetText())
 	if currentObject.HasKey(key) {
 		panic(JsonDuplicatedKeyError{key})
@@ -93,15 +99,15 @@ func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *Json_key_valu
 		// key-value pairs found in the AST may belong to it
 		newObject := xjparser.NewJsonObject()
 		currentObject.SetKey(key, newObject)
-		listener.currentEntityStack.Push(newObject)
+		listener.entityStack.Push(newObject)
 	case *ArrayValueContext:
 		// If the new value is an array we add it to the top of the stack since the next
 		// objects found in the AST may belong to it
 		newArray := xjparser.NewJsonArray()
 		currentObject.SetKey(key, newArray)
-		listener.currentEntityStack.Push(newArray)
+		listener.entityStack.Push(newArray)
 	default:
-		log.Panic(JsonParsingError{"Unexpected JSON type"})
+		panic(JsonParsingError{"Unexpected JSON type"})
 	}
 }
 
@@ -114,7 +120,12 @@ func (listener *BasicJsonGrammarListener) EnterIntValue(ctx *IntValueContext) {
 		return
 	}
 
-	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	currentStackTop, err := listener.entityStack.Peek()
+	if err != nil {
+		// Should never happen due to the grammar constraints
+		panic(JsonParsingError{"Visiting stack is empty"})
+	}
+	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	intValue, _ := strconv.ParseInt(ctx.GetText(), 10, 64)
 	jsonArray.Add(xjparser.NewJsonInt(intValue))
 }
@@ -128,7 +139,12 @@ func (listener *BasicJsonGrammarListener) EnterFloatValue(ctx *FloatValueContext
 		return
 	}
 
-	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	currentStackTop, err := listener.entityStack.Peek()
+	if err != nil {
+		// Should never happen due to the grammar constraints
+		panic(JsonParsingError{"Visiting stack is empty"})
+	}
+	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	floatValue, _ := strconv.ParseFloat(ctx.GetText(), 64)
 	jsonArray.Add(xjparser.NewJsonFloat(floatValue))
 }
@@ -142,7 +158,12 @@ func (listener *BasicJsonGrammarListener) EnterStringValue(ctx *StringValueConte
 		return
 	}
 
-	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	currentStackTop, err := listener.entityStack.Peek()
+	if err != nil {
+		// Should never happen due to the grammar constraints
+		panic(JsonParsingError{"Visiting stack is empty"})
+	}
+	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	strValue := getStringTokenWithoutQuotes(ctx.GetText())
 	jsonArray.Add(xjparser.NewJsonStr(strValue))
 }
@@ -156,7 +177,12 @@ func (listener *BasicJsonGrammarListener) EnterBoolValue(ctx *BoolValueContext) 
 		return
 	}
 
-	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	currentStackTop, err := listener.entityStack.Peek()
+	if err != nil {
+		// Should never happen due to the grammar constraints
+		panic(JsonParsingError{"Visiting stack is empty"})
+	}
+	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	boolValue := boolStr2Bool(ctx.GetText())
 	jsonArray.Add(xjparser.NewJsonBool(boolValue))
 }
@@ -170,7 +196,12 @@ func (listener *BasicJsonGrammarListener) EnterNullValue(ctx *NullValueContext) 
 		return
 	}
 
-	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	currentStackTop, err := listener.entityStack.Peek()
+	if err != nil {
+		// Should never happen due to the grammar constraints
+		panic(JsonParsingError{"Visiting stack is empty"})
+	}
+	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	jsonArray.Add(xjparser.NewJsonNull())
 }
 
@@ -183,10 +214,15 @@ func (listener *BasicJsonGrammarListener) EnterObjectValue(ctx *ObjectValueConte
 		return
 	}
 
-	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	currentStackTop, err := listener.entityStack.Peek()
+	if err != nil {
+		// Should never happen due to the grammar constraints
+		panic(JsonParsingError{"Visiting stack is empty"})
+	}
+	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	newObject := xjparser.NewJsonObject()
 	jsonArray.Add(newObject)
-	listener.currentEntityStack.Push(newObject)
+	listener.entityStack.Push(newObject)
 }
 
 func (listener *BasicJsonGrammarListener) EnterArrayValue(ctx *ArrayValueContext) {
@@ -198,10 +234,15 @@ func (listener *BasicJsonGrammarListener) EnterArrayValue(ctx *ArrayValueContext
 		return
 	}
 
-	jsonArray := listener.currentEntityStack.Peek().(*xjparser.JsonArray)
+	currentStackTop, err := listener.entityStack.Peek()
+	if err != nil {
+		// Should never happen due to the grammar constraints
+		panic(JsonParsingError{"Visiting stack is empty"})
+	}
+	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	newArray := xjparser.NewJsonArray()
 	jsonArray.Add(newArray)
-	listener.currentEntityStack.Push(newArray)
+	listener.entityStack.Push(newArray)
 }
 
 func boolStr2Bool(boolStr string) bool {
