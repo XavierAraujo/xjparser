@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -39,6 +40,9 @@ func TestCorrectlyFormattedJsonStrings(t *testing.T) {
 		data, err := os.ReadFile(filename)
 		assert.Nil(t, err)
 		_, err = antlr4_parser.Parse(string(data))
+		if err != nil {
+			log.Println("Encountered an error parsing the JSON object:", err)
+		}
 		assert.Nil(t, err)
 	}
 }
