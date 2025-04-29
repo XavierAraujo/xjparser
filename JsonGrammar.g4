@@ -15,20 +15,20 @@ json_key_value: (key=STRING ':' value=json_value);
 json_object: '{' (json_key_value (',' json_key_value)*)? '}';
 json_array: '[' (json_value (',' json_value)*)? ']';
 json_value
-    : INT          #IntValue
-    | FLOAT        #FloatValue
-    | STRING       #StringValue
-    | BOOL         #BoolValue
-    | NULL         #NullValue
-    | json_object  #ObjectValue
-    | json_array   #ArrayValue
+    : INT         #IntValue
+    | FLOAT       #FloatValue
+    | STRING      #StringValue
+    | BOOL        #BoolValue
+    | NULL        #NullValue
+    | json_object #ObjectValue
+    | json_array  #ArrayValue
     ;
 
 
 /* Lexer */
 
-INT: '-'*[1-9]+[0-9]* ;
-FLOAT: '-'*[1-9]+[0-9]* '.' [0-9]+ ;
+INT: INT_NUMBER ;
+FLOAT: FLOAT_NUMBER | (FLOAT_NUMBER [Ee] [\-+]? [0-9]+) | (INT_NUMBER [Ee] [\-+]? [0-9]+) ;
 STRING: '"' ( ~["\\\t\r\n] | '\\' [btnrf"\\] | HEX_VALUE )* '"';
 BOOL: 'true' | 'false' ;
 NULL: 'null' ;
@@ -36,3 +36,5 @@ WS  : [ \t\r\n]+ -> skip ;
 
 fragment HEX_VALUE: '\\u' HEX_CHAR HEX_CHAR HEX_CHAR HEX_CHAR;
 fragment HEX_CHAR: [0-9-A-F];
+fragment INT_NUMBER: '-'* [1-9]+[0-9]* ; // Cannot start by zero
+fragment FLOAT_NUMBER: '-'* [0-9]+ '.' [0-9]+ ;

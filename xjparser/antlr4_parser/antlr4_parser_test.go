@@ -274,7 +274,6 @@ func TestObjectEditingByReference(t *testing.T) {
 	assert.Equal(t, int64(2), jsonIntAfter.Value())
 }
 
-
 func TestNegativeValues(t *testing.T) {
 	json, err := Parse("{\"key1\": -100, \"key2\": -200.5, \"key3\": false, \"key4\": \"value\", \"key5\": null}")
 	assert.Nil(t, err)
@@ -289,4 +288,18 @@ func TestNegativeValues(t *testing.T) {
 	jsonFloat, ok := jsonObject.GetKey("key2").(*xjparser.JsonFloat)
 	assert.True(t, ok)
 	assert.Equal(t, float64(-200.5), jsonFloat.Value())
+}
+
+func TestExponentialValues(t *testing.T) {
+	json, _ := Parse("{\"e\": 0.123456789e-12}")
+	jsonFloat := (*json).(*xjparser.JsonObject).GetKey("e")
+	assert.Equal(t, xjparser.NewJsonFloat(0.000000000000123456789), jsonFloat)
+
+	json, _ = Parse("{\"e\": 1.234567890E+34}")
+	jsonFloat = (*json).(*xjparser.JsonObject).GetKey("e")
+	assert.Equal(t, xjparser.NewJsonFloat(12345678900000000000000000000000000), jsonFloat)
+
+	json, _ = Parse("{\"e\": 23456789012E66}")
+	jsonFloat = (*json).(*xjparser.JsonObject).GetKey("e")
+	assert.Equal(t, xjparser.NewJsonFloat(23456789012000000000000000000000000000000000000000000000000000000000000000000), jsonFloat)
 }
