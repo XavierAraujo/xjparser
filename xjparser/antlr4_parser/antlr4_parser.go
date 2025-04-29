@@ -8,6 +8,8 @@ import (
 	"github.com/antlr4-go/antlr/v4"
 )
 
+const _MAX_ALLOWED_NESTED_LEVEL = 19
+
 type BasicJsonGrammarListener struct {
 	*BaseJsonGrammarListener
 	topLevelElement xjparser.JsonValue
@@ -42,23 +44,23 @@ func Parse(inputStr string) (jsonValue *xjparser.JsonValue, err error) {
 func (listener *BasicJsonGrammarListener) EnterJsonObjectExpr(ctx *JsonObjectExprContext) {
 	// top level object
 	topLevelObject := xjparser.NewJsonObject()
-	listener.entityStack.Push(topLevelObject)
+	listener.pushEntityToStack(topLevelObject)
 	listener.topLevelElement = topLevelObject
 }
 
 func (listener *BasicJsonGrammarListener) EnterJsonArrayExpr(ctx *JsonArrayExprContext) {
 	// top level array
 	topLevelArray := xjparser.NewJsonArray()
-	listener.entityStack.Push(topLevelArray)
+	listener.pushEntityToStack(topLevelArray)
 	listener.topLevelElement = topLevelArray
 }
 
 func (listener *BasicJsonGrammarListener) ExitJson_object(ctx *Json_objectContext) {
-	listener.entityStack.Pop()
+	listener.popEntityFromStack()
 }
 
 func (listener *BasicJsonGrammarListener) ExitJson_array(ctx *Json_arrayContext) {
-	listener.entityStack.Pop()
+	listener.popEntityFromStack()
 }
 
 func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *Json_key_valueContext) {
@@ -99,13 +101,13 @@ func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *Json_key_valu
 		// key-value pairs found in the AST may belong to it
 		newObject := xjparser.NewJsonObject()
 		currentObject.SetKey(key, newObject)
-		listener.entityStack.Push(newObject)
+		listener.pushEntityToStack(newObject)
 	case *ArrayValueContext:
 		// If the new value is an array we add it to the top of the stack since the next
 		// objects found in the AST may belong to it
 		newArray := xjparser.NewJsonArray()
 		currentObject.SetKey(key, newArray)
-		listener.entityStack.Push(newArray)
+		listener.pushEntityToStack(newArray)
 	default:
 		panic(JsonParsingError{"Unexpected JSON type"})
 	}
@@ -222,7 +224,7 @@ func (listener *BasicJsonGrammarListener) EnterObjectValue(ctx *ObjectValueConte
 	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	newObject := xjparser.NewJsonObject()
 	jsonArray.Add(newObject)
-	listener.entityStack.Push(newObject)
+	listener.pushEntityToStack(newObject)
 }
 
 func (listener *BasicJsonGrammarListener) EnterArrayValue(ctx *ArrayValueContext) {
@@ -242,7 +244,7 @@ func (listener *BasicJsonGrammarListener) EnterArrayValue(ctx *ArrayValueContext
 	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	newArray := xjparser.NewJsonArray()
 	jsonArray.Add(newArray)
-	listener.entityStack.Push(newArray)
+	listener.pushEntityToStack(newArray)
 }
 
 func boolStr2Bool(boolStr string) bool {
@@ -251,6 +253,17 @@ func boolStr2Bool(boolStr string) bool {
 		boolValue = false
 	}
 	return boolValue
+}
+
+func (listener *BasicJsonGrammarListener) pushEntityToStack(jsonValue xjparser.JsonValue) {
+	listener.entityStack.Push(jsonValue)
+	if listener.entityStack.Len() > _MAX_ALLOWED_NESTED_LEVEL {
+		panic(JsonParsingError{"Reached JSON max nesting level"})
+	}
+}
+
+func (listener *BasicJsonGrammarListener) popEntityFromStack() {
+	listener.entityStack.Pop()
 }
 
 func getStringTokenWithoutQuotes(stringToken string) string {
