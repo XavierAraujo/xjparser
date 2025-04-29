@@ -29,7 +29,10 @@ json_value
 
 INT: '-'*[1-9]+[0-9]* ;
 FLOAT: '-'*[1-9]+[0-9]* '.' [0-9]+ ;
-STRING: ('"' (~["\t\r\n] | '\\' . )* '"' );
+STRING: '"' ( ~["\\\t\r\n] | '\\' [btnrf"\\] | HEX_VALUE )* '"';
 BOOL: 'true' | 'false' ;
 NULL: 'null' ;
 WS  : [ \t\r\n]+ -> skip ;
+
+fragment HEX_VALUE: '\\u' HEX_CHAR HEX_CHAR HEX_CHAR HEX_CHAR;
+fragment HEX_CHAR: [0-9-A-F];
