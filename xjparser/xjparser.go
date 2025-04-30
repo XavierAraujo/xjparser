@@ -16,7 +16,7 @@ type BasicJsonGrammarListener struct {
 	entityStack     *util.Stack[JsonValue]
 }
 
-func Parse(inputStr string) (jsonValue *JsonValue, err error) {
+func Parse(inputStr string) (jsonValue JsonValue, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			jsonValue = nil
@@ -38,7 +38,7 @@ func Parse(inputStr string) (jsonValue *JsonValue, err error) {
 
 	listener := &BasicJsonGrammarListener{entityStack: util.NewStack[JsonValue]()}
 	antlr.ParseTreeWalkerDefault.Walk(listener, parser.Expr())
-	return &listener.topLevelElement, nil
+	return listener.topLevelElement, nil
 }
 
 func (listener *BasicJsonGrammarListener) EnterJsonObjectExpr(ctx *antlr4_parser.JsonObjectExprContext) {

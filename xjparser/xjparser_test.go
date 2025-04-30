@@ -30,7 +30,7 @@ func TestMultipleTopLevelObject(t *testing.T) {
 func TestEmptyObjectWithNoWhiteSpaces(t *testing.T) {
 	json, err := Parse("{}")
 	assert.Nil(t, err)
-	jsonObject, ok := (*json).(*JsonObject)
+	jsonObject, ok := json.(*JsonObject)
 	assert.True(t, ok)
 	assert.Equal(t, 0, jsonObject.Len())
 }
@@ -38,7 +38,7 @@ func TestEmptyObjectWithNoWhiteSpaces(t *testing.T) {
 func TestEmptyObjectWithWhiteSpaces(t *testing.T) {
 	json, err := Parse(" { } ")
 	assert.Nil(t, err)
-	jsonObject, ok := (*json).(*JsonObject)
+	jsonObject, ok := json.(*JsonObject)
 	assert.True(t, ok)
 	assert.Equal(t, 0, jsonObject.Len())
 }
@@ -46,7 +46,7 @@ func TestEmptyObjectWithWhiteSpaces(t *testing.T) {
 func TestObjectWithSingleSimpleKeyValue(t *testing.T) {
 	json, err := Parse("{\"key1\": 1}")
 	assert.Nil(t, err)
-	jsonObject, ok := (*json).(*JsonObject)
+	jsonObject, ok := json.(*JsonObject)
 	assert.True(t, ok)
 	assert.Equal(t, 1, jsonObject.Len())
 
@@ -58,7 +58,7 @@ func TestObjectWithSingleSimpleKeyValue(t *testing.T) {
 func TestObjectWithAllBasicTypes(t *testing.T) {
 	json, err := Parse("{\"key1\": 1, \"key2\": 2.2, \"key3\": false, \"key4\": \"value\", \"key5\": null}")
 	assert.Nil(t, err)
-	jsonObject, ok := (*json).(*JsonObject)
+	jsonObject, ok := json.(*JsonObject)
 	assert.True(t, ok)
 	assert.Equal(t, 5, jsonObject.Len())
 
@@ -94,7 +94,7 @@ func TestRepeatedKeys(t *testing.T) {
 func TestNestedRepeatedKeys(t *testing.T) {
 	json, err := Parse("{\"key1\": {\"key1\": 2.2}}")
 	assert.Nil(t, err)
-	jsonObject1, ok := (*json).(*JsonObject)
+	jsonObject1, ok := json.(*JsonObject)
 	assert.True(t, ok)
 	assert.Equal(t, 1, jsonObject1.Len())
 
@@ -110,7 +110,7 @@ func TestNestedRepeatedKeys(t *testing.T) {
 func TestEmptyArrayWithNoWhiteSpaces(t *testing.T) {
 	json, err := Parse("[]")
 	assert.Nil(t, err)
-	jsonArray, ok := (*json).(*JsonArray)
+	jsonArray, ok := json.(*JsonArray)
 	assert.True(t, ok)
 	assert.Equal(t, 0, jsonArray.Len())
 }
@@ -118,7 +118,7 @@ func TestEmptyArrayWithNoWhiteSpaces(t *testing.T) {
 func TestEmptyArrayWithWhiteSpaces(t *testing.T) {
 	json, err := Parse(" [ ] ")
 	assert.Nil(t, err)
-	jsonArray, ok := (*json).(*JsonArray)
+	jsonArray, ok := json.(*JsonArray)
 	assert.True(t, ok)
 	assert.Equal(t, 0, jsonArray.Len())
 }
@@ -126,7 +126,7 @@ func TestEmptyArrayWithWhiteSpaces(t *testing.T) {
 func TestArrayWithSingleObject(t *testing.T) {
 	json, err := Parse("[{\"key1\": 1}]")
 	assert.Nil(t, err)
-	jsonArray, ok := (*json).(*JsonArray)
+	jsonArray, ok := json.(*JsonArray)
 	assert.True(t, ok)
 	assert.Equal(t, 1, jsonArray.Len())
 
@@ -140,7 +140,7 @@ func TestArrayWithSingleObject(t *testing.T) {
 func TestArrayWithMultipleObjectsWithin(t *testing.T) {
 	json, err := Parse("[{\"key1\": 1}, {\"key2\": 2.2}, {\"key3\": false}, {\"key4\": \"value\"}, {\"key5\": null}]")
 	assert.Nil(t, err)
-	jsonArray, ok := (*json).(*JsonArray)
+	jsonArray, ok := json.(*JsonArray)
 	assert.True(t, ok)
 	assert.Equal(t, 5, jsonArray.Len())
 
@@ -178,7 +178,7 @@ func TestArrayWithMultipleObjectsWithin(t *testing.T) {
 func TestArrayWithMultipleTypes(t *testing.T) {
 	json, err := Parse("[{\"key1\":\"value1\"}, [{\"key2\":\"value2\"}], 1, 1.1, true, \"plain-str\", null]")
 	assert.Nil(t, err)
-	jsonArray, ok := (*json).(*JsonArray)
+	jsonArray, ok := json.(*JsonArray)
 	assert.True(t, ok)
 	assert.Equal(t, 7, jsonArray.Len())
 
@@ -218,7 +218,7 @@ func TestArrayWithMultipleTypes(t *testing.T) {
 func TestNestedObjectsAndArrays(t *testing.T) {
 	json, err := Parse("{\"key1\": 5, \"key2\": {\"key3\": {\"key4\": 10, \"key5\": [{\"key6\": \"arrayValue1\"},{\"key7\": \"arrayValue2\"}]}}}")
 	assert.Nil(t, err)
-	jsonObject1, ok := (*json).(*JsonObject)
+	jsonObject1, ok := json.(*JsonObject)
 	assert.True(t, ok)
 	assert.Equal(t, 2, jsonObject1.Len())
 
@@ -260,7 +260,7 @@ func TestNestedObjectsAndArrays(t *testing.T) {
 func TestObjectEditingByReference(t *testing.T) {
 	json, err := Parse("{\"key1\": {\"key2\": 1}}")
 	assert.Nil(t, err)
-	jsonObject1, ok := (*json).(*JsonObject)
+	jsonObject1, ok := json.(*JsonObject)
 	assert.True(t, ok)
 	assert.Equal(t, 1, jsonObject1.Len())
 
@@ -276,7 +276,7 @@ func TestObjectEditingByReference(t *testing.T) {
 func TestNegativeValues(t *testing.T) {
 	json, err := Parse("{\"key1\": -100, \"key2\": -200.5, \"key3\": false, \"key4\": \"value\", \"key5\": null}")
 	assert.Nil(t, err)
-	jsonObject, ok := (*json).(*JsonObject)
+	jsonObject, ok := json.(*JsonObject)
 	assert.True(t, ok)
 	assert.Equal(t, 5, jsonObject.Len())
 
@@ -291,14 +291,14 @@ func TestNegativeValues(t *testing.T) {
 
 func TestExponentialValues(t *testing.T) {
 	json, _ := Parse("{\"e\": 0.123456789e-12}")
-	jsonFloat := (*json).(*JsonObject).GetKey("e")
+	jsonFloat := json.(*JsonObject).GetKey("e")
 	assert.Equal(t, NewJsonFloat(0.000000000000123456789), jsonFloat)
 
 	json, _ = Parse("{\"e\": 1.234567890E+34}")
-	jsonFloat = (*json).(*JsonObject).GetKey("e")
+	jsonFloat = json.(*JsonObject).GetKey("e")
 	assert.Equal(t, NewJsonFloat(12345678900000000000000000000000000), jsonFloat)
 
 	json, _ = Parse("{\"e\": 23456789012E66}")
-	jsonFloat = (*json).(*JsonObject).GetKey("e")
+	jsonFloat = json.(*JsonObject).GetKey("e")
 	assert.Equal(t, NewJsonFloat(23456789012000000000000000000000000000000000000000000000000000000000000000000), jsonFloat)
 }
