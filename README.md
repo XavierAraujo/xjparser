@@ -28,6 +28,19 @@ This is a lightweight JSON parser implemented in Go, inspired by [John Cricket's
 
 ---
 
+## ⚙️ Usage
+You can find a complete runnable example in cmd/example/example.go.
+It demonstrates how to parse a JSON string and navigate through the resulting structure using the xjparser API.
+
+To run the example:
+
+bash
+```bash
+go run ./cmd/example/example.go
+```
+
+This is helpful for seeing the parser in action and understanding how to work with the parsed JSON structure.
+
 ## 🔤 ANTLR4 Grammar
 
 This project includes a custom ANTLR4 grammar for JSON parsing, making it easy to convert raw JSON strings into Go-native structures using your `JsonValue` interface.
