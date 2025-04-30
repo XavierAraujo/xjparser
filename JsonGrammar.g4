@@ -29,12 +29,12 @@ json_value
 
 INT: INT_NUMBER ;
 FLOAT: FLOAT_NUMBER | (FLOAT_NUMBER [Ee] [\-+]? [0-9]+) | (INT_NUMBER [Ee] [\-+]? [0-9]+) ;
-STRING: '"' ( ~["\\\t\r\n] | '\\' [btnrf"\\] | HEX_VALUE )* '"';
+STRING: '"' ( ~["\\\t\r\n] | '\\' [btnrf"\\/] | HEX_VALUE )* '"';
 BOOL: 'true' | 'false' ;
 NULL: 'null' ;
 WS  : [ \t\r\n]+ -> skip ;
 
 fragment HEX_VALUE: '\\u' HEX_CHAR HEX_CHAR HEX_CHAR HEX_CHAR;
-fragment HEX_CHAR: [0-9-A-F];
-fragment INT_NUMBER: '-'* [1-9]+[0-9]* ; // Cannot start by zero
+fragment HEX_CHAR: [0-9-A-Fa-f];
+fragment INT_NUMBER:  '-'* ([0] | ([1-9]+[0-9]*)) ; 
 fragment FLOAT_NUMBER: '-'* [0-9]+ '.' [0-9]+ ;
