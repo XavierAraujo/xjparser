@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	input := "{  \"bla\": {\"blo\":\"bli\"}}"
-	fmt.Println("parsing: ", input)
+	input := "{\"bla\": {\"blo\": \"bli\"}}"
+	fmt.Println("Parsing string: ", input)
 	antlr4_parser.Parse(input)
 }
