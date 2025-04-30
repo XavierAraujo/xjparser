@@ -5,7 +5,7 @@ prog: expr;
 expr: json_expr EOF;
 
 json_expr: json_object #JsonObjectExpr
-    | json_array  #JsonArrayExpr
+    | json_array       #JsonArrayExpr
     ;
 
 
