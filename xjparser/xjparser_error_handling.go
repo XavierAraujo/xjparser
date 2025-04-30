@@ -1,4 +1,4 @@
-package antlr4_parser
+package xjparser
 
 import (
 	"log"

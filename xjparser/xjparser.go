@@ -1,8 +1,8 @@
-package antlr4_parser
+package xjparser
 
 import (
 	"strconv"
-	"xjparser/xjparser"
+	"xjparser/xjparser/antlr4_parser"
 	"xjparser/xjparser/util"
 
 	"github.com/antlr4-go/antlr/v4"
@@ -11,12 +11,12 @@ import (
 const _MAX_ALLOWED_NESTED_LEVEL = 19
 
 type BasicJsonGrammarListener struct {
-	*BaseJsonGrammarListener
-	topLevelElement xjparser.JsonValue
-	entityStack     *util.Stack[xjparser.JsonValue]
+	*antlr4_parser.BaseJsonGrammarListener
+	topLevelElement JsonValue
+	entityStack     *util.Stack[JsonValue]
 }
 
-func Parse(inputStr string) (jsonValue *xjparser.JsonValue, err error) {
+func Parse(inputStr string) (jsonValue *JsonValue, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			jsonValue = nil
@@ -27,35 +27,35 @@ func Parse(inputStr string) (jsonValue *xjparser.JsonValue, err error) {
 	errorListener := JsonErrorListener{}
 
 	input := antlr.NewInputStream(inputStr)
-	lexer := NewJsonGrammarLexer(input)
+	lexer := antlr4_parser.NewJsonGrammarLexer(input)
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(&errorListener)
 
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
-	parser := NewJsonGrammarParser(stream)
+	parser := antlr4_parser.NewJsonGrammarParser(stream)
 	parser.RemoveErrorListeners()
 	parser.AddErrorListener(&errorListener)
 
-	listener := &BasicJsonGrammarListener{entityStack: util.NewStack[xjparser.JsonValue]()}
+	listener := &BasicJsonGrammarListener{entityStack: util.NewStack[JsonValue]()}
 	antlr.ParseTreeWalkerDefault.Walk(listener, parser.Expr())
 	return &listener.topLevelElement, nil
 }
 
-func (listener *BasicJsonGrammarListener) EnterJsonObjectExpr(ctx *JsonObjectExprContext) {
+func (listener *BasicJsonGrammarListener) EnterJsonObjectExpr(ctx *antlr4_parser.JsonObjectExprContext) {
 	// top level object
-	topLevelObject := xjparser.NewJsonObject()
+	topLevelObject := NewJsonObject()
 	listener.pushEntityToStack(topLevelObject)
 	listener.topLevelElement = topLevelObject
 }
 
-func (listener *BasicJsonGrammarListener) EnterJsonArrayExpr(ctx *JsonArrayExprContext) {
+func (listener *BasicJsonGrammarListener) EnterJsonArrayExpr(ctx *antlr4_parser.JsonArrayExprContext) {
 	// top level array
-	topLevelArray := xjparser.NewJsonArray()
+	topLevelArray := NewJsonArray()
 	listener.pushEntityToStack(topLevelArray)
 	listener.topLevelElement = topLevelArray
 }
 
-func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *Json_key_valueContext) {
+func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *antlr4_parser.Json_key_valueContext) {
 	// Add newly found key-value pair to the current entity
 	currentStackTop, err := listener.entityStack.Peek()
 	if err != nil {
@@ -65,39 +65,39 @@ func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *Json_key_valu
 
 	// key-value pairs can only be found inside objects as defined in the grammar
 	// so this cast is already pre-validated by the grammar itself
-	currentObject := currentStackTop.(*xjparser.JsonObject)
-	key := getStringTokenWithoutQuotes(ctx.key.GetText())
+	currentObject := currentStackTop.(*JsonObject)
+	key := getStringTokenWithoutQuotes(ctx.GetKey().GetText())
 	if currentObject.HasKey(key) {
 		panic(JsonDuplicatedKeyError{key})
 	}
 
-	switch ctx.value.(type) {
-	case *IntValueContext:
-		intValue, _ := strconv.ParseInt(ctx.value.GetText(), 10, 64)
+	switch ctx.GetValue().(type) {
+	case *antlr4_parser.IntValueContext:
+		intValue, _ := strconv.ParseInt(ctx.GetValue().GetText(), 10, 64)
 		// TODO: Error validation for bit size. Validation for numeric value done by the grammar already
-		currentObject.SetKey(key, xjparser.NewJsonInt(intValue))
-	case *FloatValueContext:
-		floatValue, _ := strconv.ParseFloat(ctx.value.GetText(), 64)
+		currentObject.SetKey(key, NewJsonInt(intValue))
+	case *antlr4_parser.FloatValueContext:
+		floatValue, _ := strconv.ParseFloat(ctx.GetValue().GetText(), 64)
 		// TODO: Error validation for bit size. Validation for numeric value done by the grammar already
-		currentObject.SetKey(key, xjparser.NewJsonFloat(floatValue))
-	case *StringValueContext:
-		strValue := getStringTokenWithoutQuotes(ctx.value.GetText())
-		currentObject.SetKey(key, xjparser.NewJsonStr(strValue))
-	case *BoolValueContext:
-		boolValue := boolStr2Bool(ctx.value.GetText())
-		currentObject.SetKey(key, xjparser.NewJsonBool(boolValue))
-	case *NullValueContext:
-		currentObject.SetKey(key, xjparser.NewJsonNull())
-	case *ObjectValueContext:
+		currentObject.SetKey(key, NewJsonFloat(floatValue))
+	case *antlr4_parser.StringValueContext:
+		strValue := getStringTokenWithoutQuotes(ctx.GetValue().GetText())
+		currentObject.SetKey(key, NewJsonStr(strValue))
+	case *antlr4_parser.BoolValueContext:
+		boolValue := boolStr2Bool(ctx.GetValue().GetText())
+		currentObject.SetKey(key, NewJsonBool(boolValue))
+	case *antlr4_parser.NullValueContext:
+		currentObject.SetKey(key, NewJsonNull())
+	case *antlr4_parser.ObjectValueContext:
 		// If the new value is an object we add it to the top of the stack since the next
 		// key-value pairs found in the AST may belong to it
-		newObject := xjparser.NewJsonObject()
+		newObject := NewJsonObject()
 		currentObject.SetKey(key, newObject)
 		listener.pushEntityToStack(newObject)
-	case *ArrayValueContext:
+	case *antlr4_parser.ArrayValueContext:
 		// If the new value is an array we add it to the top of the stack since the next
 		// objects found in the AST may belong to it
-		newArray := xjparser.NewJsonArray()
+		newArray := NewJsonArray()
 		currentObject.SetKey(key, newArray)
 		listener.pushEntityToStack(newArray)
 	default:
@@ -105,8 +105,8 @@ func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *Json_key_valu
 	}
 }
 
-func (listener *BasicJsonGrammarListener) EnterIntValue(ctx *IntValueContext) {
-	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+func (listener *BasicJsonGrammarListener) EnterIntValue(ctx *antlr4_parser.IntValueContext) {
+	_, isParentKeyValueParserRule := ctx.GetParent().(*antlr4_parser.Json_key_valueContext)
 	if isParentKeyValueParserRule {
 		return // Ignore. Value already processed on entering the key-value parser rule
 	}
@@ -115,13 +115,13 @@ func (listener *BasicJsonGrammarListener) EnterIntValue(ctx *IntValueContext) {
 	if err != nil {
 		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
-	jsonArray := currentStackTop.(*xjparser.JsonArray)
+	jsonArray := currentStackTop.(*JsonArray)
 	intValue, _ := strconv.ParseInt(ctx.GetText(), 10, 64)
-	jsonArray.Add(xjparser.NewJsonInt(intValue))
+	jsonArray.Add(NewJsonInt(intValue))
 }
 
-func (listener *BasicJsonGrammarListener) EnterFloatValue(ctx *FloatValueContext) {
-	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+func (listener *BasicJsonGrammarListener) EnterFloatValue(ctx *antlr4_parser.FloatValueContext) {
+	_, isParentKeyValueParserRule := ctx.GetParent().(*antlr4_parser.Json_key_valueContext)
 	if isParentKeyValueParserRule {
 		return // Ignore. Value already processed on entering the key-value parser rule
 	}
@@ -130,13 +130,13 @@ func (listener *BasicJsonGrammarListener) EnterFloatValue(ctx *FloatValueContext
 	if err != nil {
 		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
-	jsonArray := currentStackTop.(*xjparser.JsonArray)
+	jsonArray := currentStackTop.(*JsonArray)
 	floatValue, _ := strconv.ParseFloat(ctx.GetText(), 64)
-	jsonArray.Add(xjparser.NewJsonFloat(floatValue))
+	jsonArray.Add(NewJsonFloat(floatValue))
 }
 
-func (listener *BasicJsonGrammarListener) EnterStringValue(ctx *StringValueContext) {
-	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+func (listener *BasicJsonGrammarListener) EnterStringValue(ctx *antlr4_parser.StringValueContext) {
+	_, isParentKeyValueParserRule := ctx.GetParent().(*antlr4_parser.Json_key_valueContext)
 	if isParentKeyValueParserRule {
 		return // Ignore. Value already processed on entering the key-value parser rule
 	}
@@ -145,13 +145,13 @@ func (listener *BasicJsonGrammarListener) EnterStringValue(ctx *StringValueConte
 	if err != nil {
 		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
-	jsonArray := currentStackTop.(*xjparser.JsonArray)
+	jsonArray := currentStackTop.(*JsonArray)
 	strValue := getStringTokenWithoutQuotes(ctx.GetText())
-	jsonArray.Add(xjparser.NewJsonStr(strValue))
+	jsonArray.Add(NewJsonStr(strValue))
 }
 
-func (listener *BasicJsonGrammarListener) EnterBoolValue(ctx *BoolValueContext) {
-	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+func (listener *BasicJsonGrammarListener) EnterBoolValue(ctx *antlr4_parser.BoolValueContext) {
+	_, isParentKeyValueParserRule := ctx.GetParent().(*antlr4_parser.Json_key_valueContext)
 	if isParentKeyValueParserRule {
 		return // Ignore. Value already processed on entering the key-value parser rule
 	}
@@ -160,13 +160,13 @@ func (listener *BasicJsonGrammarListener) EnterBoolValue(ctx *BoolValueContext) 
 	if err != nil {
 		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
-	jsonArray := currentStackTop.(*xjparser.JsonArray)
+	jsonArray := currentStackTop.(*JsonArray)
 	boolValue := boolStr2Bool(ctx.GetText())
-	jsonArray.Add(xjparser.NewJsonBool(boolValue))
+	jsonArray.Add(NewJsonBool(boolValue))
 }
 
-func (listener *BasicJsonGrammarListener) EnterNullValue(ctx *NullValueContext) {
-	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+func (listener *BasicJsonGrammarListener) EnterNullValue(ctx *antlr4_parser.NullValueContext) {
+	_, isParentKeyValueParserRule := ctx.GetParent().(*antlr4_parser.Json_key_valueContext)
 	if isParentKeyValueParserRule {
 		return // Ignore. Value already processed on entering the key-value parser rule
 	}
@@ -175,12 +175,12 @@ func (listener *BasicJsonGrammarListener) EnterNullValue(ctx *NullValueContext) 
 	if err != nil {
 		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
-	jsonArray := currentStackTop.(*xjparser.JsonArray)
-	jsonArray.Add(xjparser.NewJsonNull())
+	jsonArray := currentStackTop.(*JsonArray)
+	jsonArray.Add(NewJsonNull())
 }
 
-func (listener *BasicJsonGrammarListener) EnterObjectValue(ctx *ObjectValueContext) {
-	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+func (listener *BasicJsonGrammarListener) EnterObjectValue(ctx *antlr4_parser.ObjectValueContext) {
+	_, isParentKeyValueParserRule := ctx.GetParent().(*antlr4_parser.Json_key_valueContext)
 	if isParentKeyValueParserRule {
 		return // Ignore. Value already processed on entering the key-value parser rule
 	}
@@ -189,18 +189,18 @@ func (listener *BasicJsonGrammarListener) EnterObjectValue(ctx *ObjectValueConte
 	if err != nil {
 		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
-	jsonArray := currentStackTop.(*xjparser.JsonArray)
-	newObject := xjparser.NewJsonObject()
+	jsonArray := currentStackTop.(*JsonArray)
+	newObject := NewJsonObject()
 	jsonArray.Add(newObject)
 	listener.pushEntityToStack(newObject)
 }
 
-func (listener *BasicJsonGrammarListener) ExitJson_object(ctx *Json_objectContext) {
+func (listener *BasicJsonGrammarListener) ExitJson_object(ctx *antlr4_parser.Json_objectContext) {
 	listener.popEntityFromStack()
 }
 
-func (listener *BasicJsonGrammarListener) EnterArrayValue(ctx *ArrayValueContext) {
-	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+func (listener *BasicJsonGrammarListener) EnterArrayValue(ctx *antlr4_parser.ArrayValueContext) {
+	_, isParentKeyValueParserRule := ctx.GetParent().(*antlr4_parser.Json_key_valueContext)
 	if isParentKeyValueParserRule {
 		return // Ignore. Value already processed on entering the key-value parser rule
 	}
@@ -209,13 +209,13 @@ func (listener *BasicJsonGrammarListener) EnterArrayValue(ctx *ArrayValueContext
 	if err != nil {
 		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
-	jsonArray := currentStackTop.(*xjparser.JsonArray)
-	newArray := xjparser.NewJsonArray()
+	jsonArray := currentStackTop.(*JsonArray)
+	newArray := NewJsonArray()
 	jsonArray.Add(newArray)
 	listener.pushEntityToStack(newArray)
 }
 
-func (listener *BasicJsonGrammarListener) ExitJson_array(ctx *Json_arrayContext) {
+func (listener *BasicJsonGrammarListener) ExitJson_array(ctx *antlr4_parser.Json_arrayContext) {
 	listener.popEntityFromStack()
 }
 
@@ -227,7 +227,7 @@ func boolStr2Bool(boolStr string) bool {
 	return boolValue
 }
 
-func (listener *BasicJsonGrammarListener) pushEntityToStack(jsonValue xjparser.JsonValue) {
+func (listener *BasicJsonGrammarListener) pushEntityToStack(jsonValue JsonValue) {
 	listener.entityStack.Push(jsonValue)
 	if listener.entityStack.Len() > _MAX_ALLOWED_NESTED_LEVEL {
 		panic(JsonParsingError{"Reached JSON max nesting level"})

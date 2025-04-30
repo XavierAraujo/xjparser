@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"xjparser/xjparser/antlr4_parser"
+	"xjparser/xjparser"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -23,7 +23,7 @@ func TestWronglyFormattedJsonStrings(t *testing.T) {
 		fmt.Println("Testing wrongly formatted file: ", filename)
 		data, err := os.ReadFile(filename)
 		assert.Nil(t, err)
-		_, err = antlr4_parser.Parse(string(data))
+		_, err = xjparser.Parse(string(data))
 		assert.NotNil(t, err)
 	}
 }
@@ -39,7 +39,7 @@ func TestCorrectlyFormattedJsonStrings(t *testing.T) {
 		fmt.Println("Testing correctly formatted file: ", filename)
 		data, err := os.ReadFile(filename)
 		assert.Nil(t, err)
-		_, err = antlr4_parser.Parse(string(data))
+		_, err = xjparser.Parse(string(data))
 		if err != nil {
 			log.Println("Encountered an error parsing the JSON object:", err)
 		}
