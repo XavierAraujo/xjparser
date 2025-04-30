@@ -55,14 +55,6 @@ func (listener *BasicJsonGrammarListener) EnterJsonArrayExpr(ctx *JsonArrayExprC
 	listener.topLevelElement = topLevelArray
 }
 
-func (listener *BasicJsonGrammarListener) ExitJson_object(ctx *Json_objectContext) {
-	listener.popEntityFromStack()
-}
-
-func (listener *BasicJsonGrammarListener) ExitJson_array(ctx *Json_arrayContext) {
-	listener.popEntityFromStack()
-}
-
 func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *Json_key_valueContext) {
 	// Add newly found key-value pair to the current entity
 	currentStackTop, err := listener.entityStack.Peek()
@@ -114,18 +106,14 @@ func (listener *BasicJsonGrammarListener) EnterJson_key_value(ctx *Json_key_valu
 }
 
 func (listener *BasicJsonGrammarListener) EnterIntValue(ctx *IntValueContext) {
-	_, ok := ctx.GetParent().(*Json_key_valueContext)
-	if ok {
-		// If the parent of this value is a json_key_value rule then this
-		// was already processed on entering that rule and we can just
-		// ignore it
-		return
+	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+	if isParentKeyValueParserRule {
+		return // Ignore. Value already processed on entering the key-value parser rule
 	}
 
 	currentStackTop, err := listener.entityStack.Peek()
 	if err != nil {
-		// Should never happen due to the grammar constraints
-		panic(JsonParsingError{"Visiting stack is empty"})
+		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
 	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	intValue, _ := strconv.ParseInt(ctx.GetText(), 10, 64)
@@ -133,18 +121,14 @@ func (listener *BasicJsonGrammarListener) EnterIntValue(ctx *IntValueContext) {
 }
 
 func (listener *BasicJsonGrammarListener) EnterFloatValue(ctx *FloatValueContext) {
-	_, ok := ctx.GetParent().(*Json_key_valueContext)
-	if ok {
-		// If the parent of this value is a json_key_value rule then this
-		// was already processed on entering that rule and we can just
-		// ignore it
-		return
+	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+	if isParentKeyValueParserRule {
+		return // Ignore. Value already processed on entering the key-value parser rule
 	}
 
 	currentStackTop, err := listener.entityStack.Peek()
 	if err != nil {
-		// Should never happen due to the grammar constraints
-		panic(JsonParsingError{"Visiting stack is empty"})
+		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
 	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	floatValue, _ := strconv.ParseFloat(ctx.GetText(), 64)
@@ -152,18 +136,14 @@ func (listener *BasicJsonGrammarListener) EnterFloatValue(ctx *FloatValueContext
 }
 
 func (listener *BasicJsonGrammarListener) EnterStringValue(ctx *StringValueContext) {
-	_, ok := ctx.GetParent().(*Json_key_valueContext)
-	if ok {
-		// If the parent of this value is a json_key_value rule then this
-		// was already processed on entering that rule and we can just
-		// ignore it
-		return
+	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+	if isParentKeyValueParserRule {
+		return // Ignore. Value already processed on entering the key-value parser rule
 	}
 
 	currentStackTop, err := listener.entityStack.Peek()
 	if err != nil {
-		// Should never happen due to the grammar constraints
-		panic(JsonParsingError{"Visiting stack is empty"})
+		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
 	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	strValue := getStringTokenWithoutQuotes(ctx.GetText())
@@ -171,18 +151,14 @@ func (listener *BasicJsonGrammarListener) EnterStringValue(ctx *StringValueConte
 }
 
 func (listener *BasicJsonGrammarListener) EnterBoolValue(ctx *BoolValueContext) {
-	_, ok := ctx.GetParent().(*Json_key_valueContext)
-	if ok {
-		// If the parent of this value is a json_key_value rule then this
-		// was already processed on entering that rule and we can just
-		// ignore it
-		return
+	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+	if isParentKeyValueParserRule {
+		return // Ignore. Value already processed on entering the key-value parser rule
 	}
 
 	currentStackTop, err := listener.entityStack.Peek()
 	if err != nil {
-		// Should never happen due to the grammar constraints
-		panic(JsonParsingError{"Visiting stack is empty"})
+		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
 	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	boolValue := boolStr2Bool(ctx.GetText())
@@ -190,36 +166,28 @@ func (listener *BasicJsonGrammarListener) EnterBoolValue(ctx *BoolValueContext) 
 }
 
 func (listener *BasicJsonGrammarListener) EnterNullValue(ctx *NullValueContext) {
-	_, ok := ctx.GetParent().(*Json_key_valueContext)
-	if ok {
-		// If the parent of this value is a json_key_value rule then this
-		// was already processed on entering that rule and we can just
-		// ignore it
-		return
+	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+	if isParentKeyValueParserRule {
+		return // Ignore. Value already processed on entering the key-value parser rule
 	}
 
 	currentStackTop, err := listener.entityStack.Peek()
 	if err != nil {
-		// Should never happen due to the grammar constraints
-		panic(JsonParsingError{"Visiting stack is empty"})
+		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
 	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	jsonArray.Add(xjparser.NewJsonNull())
 }
 
 func (listener *BasicJsonGrammarListener) EnterObjectValue(ctx *ObjectValueContext) {
-	_, ok := ctx.GetParent().(*Json_key_valueContext)
-	if ok {
-		// If the parent of this value is a json_key_value rule then this
-		// was already processed on entering that rule and we can just
-		// ignore it
-		return
+	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+	if isParentKeyValueParserRule {
+		return // Ignore. Value already processed on entering the key-value parser rule
 	}
 
 	currentStackTop, err := listener.entityStack.Peek()
 	if err != nil {
-		// Should never happen due to the grammar constraints
-		panic(JsonParsingError{"Visiting stack is empty"})
+		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
 	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	newObject := xjparser.NewJsonObject()
@@ -227,24 +195,28 @@ func (listener *BasicJsonGrammarListener) EnterObjectValue(ctx *ObjectValueConte
 	listener.pushEntityToStack(newObject)
 }
 
+func (listener *BasicJsonGrammarListener) ExitJson_object(ctx *Json_objectContext) {
+	listener.popEntityFromStack()
+}
+
 func (listener *BasicJsonGrammarListener) EnterArrayValue(ctx *ArrayValueContext) {
-	_, ok := ctx.GetParent().(*Json_key_valueContext)
-	if ok {
-		// If the parent of this value is a json_key_value rule then this
-		// was already processed on entering that rule and we can just
-		// ignore it
-		return
+	_, isParentKeyValueParserRule := ctx.GetParent().(*Json_key_valueContext)
+	if isParentKeyValueParserRule {
+		return // Ignore. Value already processed on entering the key-value parser rule
 	}
 
 	currentStackTop, err := listener.entityStack.Peek()
 	if err != nil {
-		// Should never happen due to the grammar constraints
-		panic(JsonParsingError{"Visiting stack is empty"})
+		panic(JsonParsingError{"Visiting stack is empty"}) // Should never happen due to the grammar constraints
 	}
 	jsonArray := currentStackTop.(*xjparser.JsonArray)
 	newArray := xjparser.NewJsonArray()
 	jsonArray.Add(newArray)
 	listener.pushEntityToStack(newArray)
+}
+
+func (listener *BasicJsonGrammarListener) ExitJson_array(ctx *Json_arrayContext) {
+	listener.popEntityFromStack()
 }
 
 func boolStr2Bool(boolStr string) bool {
