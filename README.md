@@ -37,5 +37,15 @@ To generate the Go parser from the grammar just run the following script (you'll
 generate-grammar.sh
 ```
 
+## 🧪 How to test
+
+Just run 
+
+```bash
+go test ./...
+```
+
+It recursively searches all project sub-folders and runs the correspondent tests
+
 ## 📝 License
 MIT — feel free to use, modify, and share!
